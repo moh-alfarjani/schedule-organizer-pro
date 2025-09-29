@@ -44,18 +44,22 @@
         exportSummary: document.getElementById('export-summary'),
         exportConfirmBtn: document.getElementById('export-confirm-btn'),
 
-        // New FAB elements
+        // FAB elements
         fabContainer: document.getElementById('fab-container'),
         fabMainBtn: document.getElementById('fab-main-btn'),
         fabImportBtn: document.getElementById('fab-import-btn'),
         fabExportBtn: document.getElementById('fab-export-btn'),
         fabLangBtn: document.getElementById('fab-lang-btn'),
 
-        // New Language Modal
+        // Language Modal
         languageModal: document.getElementById('language-modal'),
         langModalSwitchBtn: document.getElementById('lang-modal-switch-btn'),
         langModalKeepBtn: document.getElementById('lang-modal-keep-btn'),
         langModalDontAsk: document.getElementById('lang-modal-dont-ask'),
+
+        // === NEW: About Developer Modal Elements ===
+        githubBtn: document.getElementById('gh-profile-btn'), // The button in the header
+        githubModal: document.getElementById('gh-profile-modal'), // The modal itself
     };
 
     // --- Constants, State, and i18n ---
@@ -89,8 +93,15 @@
             copyPaste: { title: "Paste Lecture", description: "Select the day and slot where you want to paste the lecture.", slot: "Lecture {index}" },
             export: { title: "Export Schedule", filename: "Filename", summary: "This will create a backup of a schedule containing <strong>{count}</strong> lectures.", cancel: "Cancel", confirm: "Confirm Export", alertNone: "There are no lectures to export.", alertFail: "Export failed." },
             fab: { import: "Import", export: "Export", language: "Switch Language", main: "Actions" },
-            langModal: { title: "Language Preference", description: "We noticed your system is in Arabic. Would you like to switch the app language?", switchBtn: "Switch to Arabic", keepBtn: "Keep English", dontAsk: "Don't ask me again", love: "I love you ❤️" },
-            alerts: { importSuccess: "Schedule imported successfully!" }
+            langModal: { title: "Language Preference", description: "We noticed your system is in Arabic. Would you like to switch the app language?", switchBtn: "Switch to Arabic", keepBtn: "Keep English", dontAsk: "Don't ask me again" },
+            alerts: { importSuccess: "Schedule imported successfully!" },
+            // === NEW: About Developer Modal Translations ===
+            profileModal: {
+                modalTitle: "About Developer",
+                title: "moh-alfarjani",
+                description: "a passionate programming enthusiast with an insatiable curiosity for everything new in the tech world. Currently a Computer Science student at the University of Tripoli, I enjoy improving my skills every day and experimenting with innovative programming approaches, especially integrating artificial intelligence into my projects to create real value and innovation. I firmly believe that continuous learning is the key to success, and I strive to explore, discover, and make the most out of every opportunity to grow.",
+                visitGithub: "Visit My GitHub Profile"
+            }
         },
         ar: {
             appTitle: "منظم الجدول الدراسي",
@@ -112,11 +123,17 @@
             export: { title: "النسخ الاحتياطي للجدول", filename: "اسم الملف", summary: `سيتم إنشاء نسخة احتياطية لجدول يحتوي على <strong>{count}</strong> محاضرة.`, cancel: "إلغاء", confirm: "تأكيد النسخ", alertNone: "لا توجد محاضرات لعمل نسخة احتياطية.", alertFail: "فشل النسخ الاحتياطي." },
             fab: { import: "استيراد", export: "تصدير", language: "تبديل اللغة", main: "إجراءات" },
             langModal: { title: "تفضيل اللغة", description: "لقد لاحظنا أن لغة نظامك هي العربية. هل تود تبديل لغة التطبيق؟", switchBtn: "التبديل إلى العربية", keepBtn: "إبقاء الإنجليزية", dontAsk: "عدم السؤال مرة أخرى" },
-            alerts: { importSuccess: "تم استرجاع الجدول بنجاح!" }
+            alerts: { importSuccess: "تم استرجاع الجدول بنجاح!" },
+            // === NEW: About Developer Modal Translations ===
+            profileModal: {
+                modalTitle: "عن المطور",
+                title: "محمد الفرجاني",
+                description: "عاشق لعالم البرمجة وفضولي دائم للتعلم عن كل ما هو جديد في هذا المجال. طالب في قسم علوم الحاسوب بجامعة طرابلس، أحب تطوير نفسي يوميًا وتجربة كل ما هو مبتكر في البرمجة، خاصة دمج الذكاء الاصطناعي في مشاريعي لإضافة قيمة وابتكار حقيقي. أؤمن بأن التعلم المستمر هو مفتاح النجاح، وأسعى دائمًا لاكتشاف أشياء جديدة وتجربة كل ما يمكنني الاستفادة منه.",
+                visitGithub: "زيارة ملفي على GitHub"
+            }
         }
     };
 
-    // دالة مساعدة لجلب النصوص من كائن الترجمة مع استبدال المتغيرات.
     const t = (key, replacements = {}) => {
         const textValue = key.split('.').reduce((obj, k) => obj && obj[k], i18n[currentLang]);
 
@@ -134,10 +151,6 @@
         }
         return text;
     };
-
-
-    // --- Core Data Functions ---
-    // هذه الدوال مسؤولة عن إنشاء البيانات، تحميلها من LocalStorage، وحفظها.
 
     const createEmptyLecture = () => ({
         id: `lec_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -160,7 +173,6 @@
         };
     };
 
-    // دالة لتنقية وتوحيد البيانات المحملة لضمان توافقها مع الهيكل المطلوب.
     const normalizeData = (rawData) => {
         const initial = getInitialData();
         if (typeof rawData !== 'object' || rawData === null) return initial;
@@ -346,6 +358,7 @@
     const setupAutocomplete = () => {
         ['subject', 'lecturer', 'college', 'hall', 'group'].forEach(fieldName => {
             const input = dom.editForm.elements.namedItem(fieldName);
+            if (!input) return; // Add guard clause
             const suggestionsContainer = input.nextElementSibling;
 
             const showSuggestions = (filter = '') => {
@@ -723,6 +736,7 @@
 
     // --- Filters ---
     const updateFilters = () => {
+        if (!dom.subjectFilter || !dom.dayFilter) return;
         const hasAnyLectures = getTotalLectures() > 0;
         const hasAnyFilledDays = CANONICAL_DAYS.some(day => state.schedule[day] && state.schedule[day].length > 0);
 
@@ -836,7 +850,6 @@
             renderGrid();
         });
 
-
         // Header Actions
         dom.settingsBtn.addEventListener('click', openSettingsModal);
         dom.themeToggleBtn.addEventListener('click', () => {
@@ -844,6 +857,16 @@
             applyTheme(state.settings.darkMode);
             saveData();
         });
+
+        // === NEW: About Developer Modal Listeners ===
+        if (dom.githubBtn && dom.githubModal) {
+            dom.githubBtn.addEventListener('click', () => showModal(dom.githubModal));
+            dom.githubModal.addEventListener('click', (e) => {
+                if (e.target === dom.githubModal || e.target.closest('.modal-close-button')) {
+                    hideModal(dom.githubModal);
+                }
+            });
+        }
 
         // FAB Actions
         dom.fabMainBtn.addEventListener('click', () => dom.fabContainer.classList.toggle('open'));
@@ -908,7 +931,6 @@
                 }
             }
         });
-
 
         // Confirm Modal
         dom.confirmModal.addEventListener('click', (e) => {
@@ -1057,7 +1079,6 @@
             hideModal(dom.languageModal);
         });
 
-
         // Global keydown
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
@@ -1153,6 +1174,17 @@
         dom.fabExportBtn.title = t('fab.export');
         dom.fabLangBtn.title = t('fab.language');
         dom.fabMainBtn.setAttribute('aria-label', t('fab.main'));
+        
+        // === NEW: Update About Developer Modal Text ===
+        const ghModalTitle = document.getElementById('gh-profile-modal-title');
+        const ghTitle = document.getElementById('gh-profile-title');
+        const ghDesc = document.getElementById('gh-profile-description');
+        const ghActionLink = document.getElementById('gh-profile-action-link')?.querySelector('span');
+
+        if(ghModalTitle) ghModalTitle.textContent = t('profileModal.modalTitle');
+        if(ghTitle) ghTitle.textContent = t('profileModal.title');
+        if(ghDesc) ghDesc.textContent = t('profileModal.description');
+        if(ghActionLink) ghActionLink.textContent = t('profileModal.visitGithub');
     };
 
     const setLanguage = (lang, savePreference) => {
@@ -1199,8 +1231,6 @@
         setLanguage('en', false); // Default to English
     };
 
-
-    // دالة التشغيل الرئيسية التي تبدأ كل شيء.
     const initialize = () => {
         addEventListeners();
         initializeLanguage();
