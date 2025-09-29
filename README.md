@@ -5,7 +5,7 @@ A polished, single-page **web application** for managing weekly schedules — bu
 ---
 
 ## 📸 Project Preview
-![Schedule Organizer Pro Preview](main.png)
+![Schedule Organizer Pro Preview](main.jpg)
 
 ---
 
