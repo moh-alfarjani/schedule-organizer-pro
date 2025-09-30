@@ -404,9 +404,21 @@
     };
 
     // --- Modals ---
-    // دوال للتحكم في إظهار وإخفاء النوافذ المنبثقة (Modals).
-    const showModal = (modal) => modal?.classList.remove('hidden');
-    const hideModal = (modal) => modal?.classList.add('hidden');
+    const showModal = (modal) => {
+        if (!modal) return;
+        modal.classList.remove('hidden');
+        document.body.classList.add('modal-active');
+    };
+
+    const hideModal = (modal) => {
+        if (!modal) return;
+        modal.classList.add('hidden');
+
+        const anyModalOpen = document.querySelector('.modal-overlay:not(.hidden)');
+        if (!anyModalOpen) {
+            document.body.classList.remove('modal-active');
+        }
+    };
 
     const showConfirm = (title, message, okText, okClass, onOk, showCancel = true) => {
         dom.confirmTitle.textContent = title;
@@ -1174,17 +1186,17 @@
         dom.fabExportBtn.title = t('fab.export');
         dom.fabLangBtn.title = t('fab.language');
         dom.fabMainBtn.setAttribute('aria-label', t('fab.main'));
-        
+
         // === NEW: Update About Developer Modal Text ===
         const ghModalTitle = document.getElementById('gh-profile-modal-title');
         const ghTitle = document.getElementById('gh-profile-title');
         const ghDesc = document.getElementById('gh-profile-description');
         const ghActionLink = document.getElementById('gh-profile-action-link')?.querySelector('span');
 
-        if(ghModalTitle) ghModalTitle.textContent = t('profileModal.modalTitle');
-        if(ghTitle) ghTitle.textContent = t('profileModal.title');
-        if(ghDesc) ghDesc.textContent = t('profileModal.description');
-        if(ghActionLink) ghActionLink.textContent = t('profileModal.visitGithub');
+        if (ghModalTitle) ghModalTitle.textContent = t('profileModal.modalTitle');
+        if (ghTitle) ghTitle.textContent = t('profileModal.title');
+        if (ghDesc) ghDesc.textContent = t('profileModal.description');
+        if (ghActionLink) ghActionLink.textContent = t('profileModal.visitGithub');
     };
 
     const setLanguage = (lang, savePreference) => {
