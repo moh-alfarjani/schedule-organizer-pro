@@ -1290,7 +1290,7 @@ main {
   display: flex;
   justify-content: center;
   gap: 1rem;
-  margin-top: auto; /* يدفع هذا القسم للأسفل قدر الإمكان */
+  margin-top: auto;
   padding-top: 1rem;
 }
 
@@ -1320,7 +1320,6 @@ main {
   justify-content: center;
 }
 
-/* تعديل هيكل المودال الأساسي لضمان ثبات الفوتر */
 #gh-profile-modal .modal-footer {
     border-top: 1px solid var(--border-color);
 }
