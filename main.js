@@ -1,10 +1,8 @@
 // --- IIFE Wrapper ---
-// نستخدم (IIFE) لتجنب تلويث النطاق العام (Global Scope) والحفاظ على خصوصية المتغيرات والدوال.
 (function () {
     'use strict';
 
     // --- DOM Element Selection ---
-    // هنا نجمع كل عناصر الـ DOM التي سنتعامل معها في كائن واحد لسهولة الوصول إليها.
     const dom = {
         scheduleGrid: document.getElementById('schedule-grid'),
         lectureModal: document.getElementById('lecture-modal'),
@@ -72,7 +70,6 @@
     let filters = { dayStatus: 'all', subject: 'all' };
     let currentLang = 'en';
 
-    // كائن الترجمة لدعم اللغتين العربية والإنجليزية
     const i18n = {
         en: {
             appTitle: "Schedule Organizer",
@@ -246,7 +243,6 @@
     };
 
     // --- Helper Functions ---
-    // دوال مساعدة لتنسيق الوقت وحساب المدة.
     const formatTime12Hour = (time) => {
         if (!time) return '';
         const [hours, minutes] = time.split(':');
@@ -272,7 +268,6 @@
     const getTotalLectures = () => Object.values(state.schedule).reduce((acc, day) => acc + (Array.isArray(day) ? day.length : 0), 0);
 
     // --- UI Rendering ---
-    // هذا الجزء مسؤول عن عرض البيانات في واجهة المستخدم.
     const ICONS = {
         subject: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v15H6.5A2.5 2.5 0 0 1 4 14.5v-10A2.5 2.5 0 0 1 6.5 2z"></path></svg>`,
         lecturer: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z"></path><path d="M16 12v1.5a2.5 2.5 0 0 0 5 0V12h-5z"></path><path d="M2 12v1.5a2.5 2.5 0 0 0 5 0V12H2z"></path><path d="M12 12v7h-4v-7a2 2 0 0 1 4 0z"></path><path d="M12 12v7h4v-7a2 2 0 0 0-4 0z"></path></svg>`,
@@ -312,7 +307,6 @@
         return card;
     };
 
-    // الدالة الرئيسية لرسم جدول المحاضرات
     const renderGrid = () => {
         if (!dom.scheduleGrid) return;
         dom.scheduleGrid.innerHTML = "";
@@ -1252,3 +1246,4 @@
 
     initialize();
 })();
+
