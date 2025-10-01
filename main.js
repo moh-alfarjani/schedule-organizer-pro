@@ -1,8 +1,10 @@
 // --- IIFE Wrapper ---
+// نستخدم (IIFE) لتجنب تلويث النطاق العام (Global Scope) والحفاظ على خصوصية المتغيرات والدوال.
 (function () {
     'use strict';
 
     // --- DOM Element Selection ---
+    // هنا نجمع كل عناصر الـ DOM التي سنتعامل معها في كائن واحد لسهولة الوصول إليها.
     const dom = {
         scheduleGrid: document.getElementById('schedule-grid'),
         lectureModal: document.getElementById('lecture-modal'),
@@ -67,9 +69,9 @@
 
     let state;
     let clipboard = null;
-    let filters = { dayStatus: 'all', subject: 'all' };
     let currentLang = 'en';
 
+    // كائن الترجمة لدعم اللغتين العربية والإنجليزية
     const i18n = {
         en: {
             appTitle: "Schedule Organizer",
@@ -82,7 +84,7 @@
                 return res.join(' and ') || '0 minutes';
             },
             header: { searchPlaceholder: "Search in schedule...", settingsAria: "Settings", themeAria: "Toggle Theme" },
-            filters: { view: "View:", allDays: "All", filledDays: "Filled Days", emptyDays: "Empty Days", subject: "Subject:", allSubjects: "All Subjects" },
+            filters: { view: "View:", allDays: "All", filledDays: "University Days", emptyDays: "Days Off", subject: "Subject:", allSubjects: "All Subjects" },
             lectureCard: { newSubject: "New Subject", location: "{college} / {hall}", timeRange: "{start} - {end}", countdownStarts: "Starts in: {time}", countdownInProgress: "In Progress" },
             lectureModal: { detailsTitle: "Lecture Details", addTitle: "Add Lecture - {day}", editTitle: "Edit: {subject}", viewLectureNum: "Lecture No.", viewSubject: "Subject", viewLocation: "College / Hall", viewGroup: "Group", viewTime: "Time", viewDuration: "Duration", viewLecturer: "Lecturer", notSet: "Not set", form: { subject: "Subject (Required)", lecturer: "Lecturer", college: "College", hall: "Hall", group: "Group", startTime: "Start Time", endTime: "End Time" }, footer: { copy: "Copy", delete: "Delete", edit: "Edit", cancel: "Cancel", save: "Save" } },
             confirmModal: { deleteTitle: "Confirm Deletion", deleteMessage: `Are you sure you want to delete the lecture "{subject}"?`, deleteBtn: "Yes, Delete", importTitle: "Confirm Import", importMessage: `Are you sure you want to replace your current schedule? The file contains {count} lectures. This action cannot be undone.`, importBtn: "Yes, Replace", errorTitle: "Import Error", errorMessage: "The selected file is invalid or corrupted.", okBtn: "OK", cancel: "Cancel", replaceTitle: "Confirm Replacement", replaceMessage: "This slot contains data. Do you want to replace it?", replaceBtn: "Yes, Replace" },
@@ -91,8 +93,6 @@
             export: { title: "Export Schedule", filename: "Filename", summary: "This will create a backup of a schedule containing <strong>{count}</strong> lectures.", cancel: "Cancel", confirm: "Confirm Export", alertNone: "There are no lectures to export.", alertFail: "Export failed." },
             fab: { import: "Import", export: "Export", language: "Switch Language", main: "Actions" },
             langModal: { title: "Language Preference", description: "We noticed your system is in Arabic. Would you like to switch the app language?", switchBtn: "Switch to Arabic", keepBtn: "Keep English", dontAsk: "Don't ask me again" },
-            alerts: { importSuccess: "Schedule imported successfully!" },
-            // === NEW: About Developer Modal Translations ===
             profileModal: {
                 modalTitle: "About Developer",
                 title: "moh-alfarjani",
@@ -111,7 +111,7 @@
                 return res.join(' و ') || '0 دقيقة';
             },
             header: { searchPlaceholder: "ابحث في الجدول...", settingsAria: "الإعدادات", themeAria: "تبديل المظهر" },
-            filters: { view: "عرض:", allDays: "الكل", filledDays: "الأيام الممتلئة", emptyDays: "الأيام الفارغة", subject: "المادة:", allSubjects: "كل المواد" },
+            filters: { view: "عرض:", allDays: "الكل", filledDays: "ايام الدراسة", emptyDays: "ايام الراحة", subject: "المادة:", allSubjects: "كل المواد" },
             lectureCard: { newSubject: "مادة جديدة", location: "{college} / {hall}", timeRange: "{start} - {end}", countdownStarts: "يبدأ خلال: {time}", countdownInProgress: "جاري الآن" },
             lectureModal: { detailsTitle: "تفاصيل المحاضرة", addTitle: "إضافة محاضرة - {day}", editTitle: "تعديل: {subject}", viewLectureNum: "رقم المحاضرة", viewSubject: "المادة", viewLocation: "الكلية / القاعة", viewGroup: "المجموعة", viewTime: "التوقيت", viewDuration: "المدة", viewLecturer: "المحاضر", notSet: "غير محدد", form: { subject: "المادة (مطلوب)", lecturer: "المحاضر", college: "الكلية", hall: "القاعة", group: "المجموعة", startTime: "وقت البدء", endTime: "وقت الإنتهاء" }, footer: { copy: "نسخ", delete: "حذف", edit: "تعديل", cancel: "إلغاء", save: "حفظ" } },
             confirmModal: { deleteTitle: "تأكيد الحذف", deleteMessage: `هل أنت متأكد من حذف محاضرة "{subject}"؟`, deleteBtn: "نعم, احذف", importTitle: "تأكيد استرجاع النسخة", importMessage: `هل أنت متأكد من استبدال جدولك الحالي؟ الملف يحتوي على {count} محاضرة. هذا الإجراء لا يمكن التراجع عنه.`, importBtn: "نعم, استبدل", errorTitle: "خطأ في الاسترجاع", errorMessage: "الملف الذي تم اختياره غير صالح أو تالف.", okBtn: "حسنًا", cancel: "إلغاء", replaceTitle: "تأكيد الاستبدال", replaceMessage: "هذه الخانة تحتوي على بيانات. هل تريد استبدالها؟", replaceBtn: "نعم, استبدل" },
@@ -120,8 +120,6 @@
             export: { title: "النسخ الاحتياطي للجدول", filename: "اسم الملف", summary: `سيتم إنشاء نسخة احتياطية لجدول يحتوي على <strong>{count}</strong> محاضرة.`, cancel: "إلغاء", confirm: "تأكيد النسخ", alertNone: "لا توجد محاضرات لعمل نسخة احتياطية.", alertFail: "فشل النسخ الاحتياطي." },
             fab: { import: "استيراد", export: "تصدير", language: "تبديل اللغة", main: "إجراءات" },
             langModal: { title: "تفضيل اللغة", description: "لقد لاحظنا أن لغة نظامك هي العربية. هل تود تبديل لغة التطبيق؟", switchBtn: "التبديل إلى العربية", keepBtn: "إبقاء الإنجليزية", dontAsk: "عدم السؤال مرة أخرى" },
-            alerts: { importSuccess: "تم استرجاع الجدول بنجاح!" },
-            // === NEW: About Developer Modal Translations ===
             profileModal: {
                 modalTitle: "عن المطور",
                 title: "محمد الفرجاني",
@@ -167,6 +165,12 @@
                 darkMode: window.matchMedia('(prefers-color-scheme: dark)').matches
             },
             managedData: { subjects: [], lecturers: [], colleges: [], halls: [], groups: [] },
+            // --- NEW: Add filters and search to the state ---
+            filters: {
+                dayStatus: 'all',
+                subject: 'all'
+            },
+            searchQuery: ''
         };
     };
 
@@ -218,6 +222,15 @@
                     normalized.managedData[key] = [...new Set((rawData.managedData[key]).map(String))];
                 }
             }
+        }
+
+        // --- NEW: Normalize filters and search data ---
+        if (rawData.filters && typeof rawData.filters === 'object') {
+            normalized.filters.dayStatus = String(rawData.filters.dayStatus ?? 'all');
+            normalized.filters.subject = String(rawData.filters.subject ?? 'all');
+        }
+        if (typeof rawData.searchQuery === 'string') {
+            normalized.searchQuery = rawData.searchQuery;
         }
 
         return normalized;
@@ -289,21 +302,16 @@
         let content = `<div class="card-item"><span class="subject">${lecture.subject || t('lectureCard.newSubject')}</span></div>`;
         if (lecture.college || lecture.hall) content += `<div class="card-item location">${ICONS.location} <span>${t('lectureCard.location', { college: lecture.college || '...', hall: lecture.hall || '...' })}</span></div>`;
         if (lecture.group) content += `<div class="card-item group">${ICONS.group} <span>${lecture.group}</span></div>`;
-
         const timeText = formatTime12Hour(lecture.startTime) && formatTime12Hour(lecture.endTime) ? t('lectureCard.timeRange', { start: formatTime12Hour(lecture.startTime), end: formatTime12Hour(lecture.endTime) }) : '';
         if (timeText) content += `<div class="card-item time">${ICONS.time} <span>${timeText}</span></div>`;
-
         const duration = calculateDuration(lecture.startTime, lecture.endTime);
         if (duration) content += `<div class="card-item duration">${ICONS.duration} <span>${duration}</span></div>`;
-
         if (lecture.lecturer) content += `<div class="card-item lecturer">${ICONS.lecturer} <span>${lecture.lecturer}</span></div>`;
 
         card.innerHTML = content;
-
         const countdown = document.createElement('div');
         countdown.className = 'countdown-timer hidden';
         card.appendChild(countdown);
-
         return card;
     };
 
@@ -316,9 +324,9 @@
             const lectures = state.schedule[dayKey] || [];
             const dayHasLectures = lectures.length > 0;
 
-            const dayIsVisible = (filters.dayStatus === 'all') ||
-                (filters.dayStatus === 'filled' && dayHasLectures) ||
-                (filters.dayStatus === 'empty' && !dayHasLectures);
+            const dayIsVisible = (state.filters.dayStatus === 'all') ||
+                (state.filters.dayStatus === 'filled' && dayHasLectures) ||
+                (state.filters.dayStatus === 'empty' && !dayHasLectures);
 
             if (!dayIsVisible) return;
 
@@ -330,7 +338,7 @@
             if (dayHasLectures) lecturesContainer.classList.add('has-lectures');
 
             lectures.forEach((lecture, index) => {
-                const subjectIsVisible = filters.subject === 'all' || filters.subject === lecture.subject;
+                const subjectIsVisible = state.filters.subject === 'all' || state.filters.subject === lecture.subject;
                 if (subjectIsVisible) {
                     lecturesContainer.appendChild(createLectureCard(lecture, dayKey, index));
                 }
@@ -352,7 +360,7 @@
     const setupAutocomplete = () => {
         ['subject', 'lecturer', 'college', 'hall', 'group'].forEach(fieldName => {
             const input = dom.editForm.elements.namedItem(fieldName);
-            if (!input) return; // Add guard clause
+            if (!input) return;
             const suggestionsContainer = input.nextElementSibling;
 
             const showSuggestions = (filter = '') => {
@@ -407,7 +415,6 @@
     const hideModal = (modal) => {
         if (!modal) return;
         modal.classList.add('hidden');
-
         const anyModalOpen = document.querySelector('.modal-overlay:not(.hidden)');
         if (!anyModalOpen) {
             document.body.classList.remove('modal-active');
@@ -454,10 +461,8 @@
         content += `<div class="view-item">${ICONS.subject}<div class="view-item-content"><span class="label">${t('lectureModal.viewSubject')}</span><span class="value subject">${lecture.subject || '-'}</span></div></div>`;
         if (lecture.college || lecture.hall) content += `<div class="view-item">${ICONS.location}<div class="view-item-content"><span class="label">${t('lectureModal.viewLocation')}</span><span class="value location">${t('lectureCard.location', { college: lecture.college || '-', hall: lecture.hall || '-' })}</span></div></div>`;
         if (lecture.group) content += `<div class="view-item">${ICONS.group}<div class="view-item-content"><span class="label">${t('lectureModal.viewGroup')}</span><span class="value group">${lecture.group}</span></div></div>`;
-
         const timeText = formatTime12Hour(lecture.startTime) && formatTime12Hour(lecture.endTime) ? t('lectureCard.timeRange', { start: formatTime12Hour(lecture.startTime), end: formatTime12Hour(lecture.endTime) }) : t('lectureModal.notSet');
         content += `<div class="view-item">${ICONS.time}<div class="view-item-content"><span class="label">${t('lectureModal.viewTime')}</span><span class="value time">${timeText}</span></div></div>`;
-
         const duration = calculateDuration(lecture.startTime, lecture.endTime);
         if (duration) content += `<div class="view-item">${ICONS.duration}<div class="view-item-content"><span class="label">${t('lectureModal.viewDuration')}</span><span class="value duration">${duration}</span></div></div>`;
         if (lecture.lecturer) content += `<div class="view-item lecturer">${ICONS.lecturer}<div class="view-item-content"><span class="label">${t('lectureModal.viewLecturer')}</span><span class="value">${lecture.lecturer}</span></div></div>`;
@@ -479,7 +484,6 @@
         const isNew = index === undefined;
         const lecture = isNew ? createEmptyLecture() : state.schedule[day][index];
         const titleKey = isNew ? 'lectureModal.addTitle' : 'lectureModal.editTitle';
-
         const dayIndex = CANONICAL_DAYS.indexOf(day);
         const dayDisplayName = dayIndex > -1 ? i18n[currentLang].days[dayIndex] : day;
         dom.modalTitle.textContent = t(titleKey, { day: dayDisplayName, subject: lecture.subject || 'lecture' });
@@ -547,7 +551,6 @@
             }
 
             const diffSeconds = Math.round((startTime.getTime() - now.getTime()) / 1000);
-
             countdownEl.classList.remove('hidden', 'in-progress', 'ended', 'status-safe', 'status-soon', 'status-urgent');
 
             if (diffSeconds > 0) {
@@ -693,7 +696,8 @@
     const handleExport = () => {
         const totalLectures = getTotalLectures();
         const now = new Date();
-        const timestamp = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}`;
+        const timestamp = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}-${now.getMinutes().toString().padStart(2, '0')}-${now.getSeconds().toString().padStart(2, '0')}`;
+
         dom.exportFilenameInput.value = `schedule_backup_${timestamp}`;
         dom.exportSummary.innerHTML = `<p>${t('export.summary', { count: totalLectures })}</p>`;
         showModal(dom.exportModal);
@@ -709,13 +713,10 @@
                 const content = e.target?.result;
                 if (typeof content !== 'string') throw new Error("File content is not readable.");
                 const parsedData = JSON.parse(content);
-
                 if (!parsedData.schedule || !parsedData.settings) {
                     throw new Error("Invalid file format.");
                 }
-
                 const totalLectures = Object.values(parsedData.schedule).reduce((acc, day) => acc + (Array.isArray(day) ? day.length : 0), 0);
-
                 showConfirm(
                     t('confirmModal.importTitle'),
                     t('confirmModal.importMessage', { count: totalLectures }),
@@ -727,10 +728,8 @@
                         applyState();
                         renderGrid();
                         updateFilters();
-                        alert(t('alerts.importSuccess'));
                     }
                 );
-
             } catch (error) {
                 console.error("Import failed:", error);
                 showConfirm(t('confirmModal.errorTitle'), t('confirmModal.errorMessage'), t('confirmModal.okBtn'), 'btn-primary', () => { });
@@ -747,13 +746,11 @@
         const hasAnyFilledDays = CANONICAL_DAYS.some(day => state.schedule[day] && state.schedule[day].length > 0);
 
         dom.subjectFilter.disabled = !hasAnyLectures;
-
         const filledOption = dom.dayFilter.querySelector('option[value="filled"]');
         if (filledOption) {
             filledOption.disabled = !hasAnyFilledDays;
         }
 
-        // Populate subject filter
         const currentSubject = dom.subjectFilter.value;
         dom.subjectFilter.innerHTML = `<option value="all">${t('filters.allSubjects')}</option>`;
         state.managedData.subjects.forEach(subject => {
@@ -766,7 +763,7 @@
     };
 
     // --- Event Handlers ---
-    const handleFormSubmit = async (event) => {
+    const handleFormSubmit = (event) => {
         event.preventDefault();
         const { day, index } = dom.lectureModal.dataset;
         if (!day) return;
@@ -820,7 +817,7 @@
     };
 
     const handleSearch = () => {
-        const query = dom.searchInput.value.toLowerCase().trim();
+        const query = state.searchQuery.toLowerCase().trim();
         dom.scheduleGrid.querySelectorAll(".lecture-card").forEach(card => {
             card.classList.remove("highlight", "dimmed");
             if (query) {
@@ -832,9 +829,7 @@
     };
 
     // --- Initialization ---
-    // هنا نربط كل الأحداث (events) بعناصر الـ DOM.
     const addEventListeners = () => {
-        // Main grid clicks
         dom.scheduleGrid.addEventListener('click', (e) => {
             const target = e.target;
             const card = target.closest('.lecture-card');
@@ -843,20 +838,23 @@
             else if (addCard) openLectureModal(addCard.dataset.day);
         });
 
-        // Search
-        dom.searchInput.addEventListener('input', handleSearch);
+        dom.searchInput.addEventListener('input', () => {
+            state.searchQuery = dom.searchInput.value;
+            saveData();
+            handleSearch();
+        });
 
-        // Filters
         dom.dayFilter.addEventListener('change', e => {
-            filters.dayStatus = e.target.value;
+            state.filters.dayStatus = e.target.value;
+            saveData();
             renderGrid();
         });
         dom.subjectFilter.addEventListener('change', e => {
-            filters.subject = e.target.value;
+            state.filters.subject = e.target.value;
+            saveData();
             renderGrid();
         });
 
-        // Header Actions
         dom.settingsBtn.addEventListener('click', openSettingsModal);
         dom.themeToggleBtn.addEventListener('click', () => {
             state.settings.darkMode = !state.settings.darkMode;
@@ -864,7 +862,6 @@
             saveData();
         });
 
-        // === NEW: About Developer Modal Listeners ===
         if (dom.githubBtn && dom.githubModal) {
             dom.githubBtn.addEventListener('click', () => showModal(dom.githubModal));
             dom.githubModal.addEventListener('click', (e) => {
@@ -874,7 +871,6 @@
             });
         }
 
-        // FAB Actions
         dom.fabMainBtn.addEventListener('click', () => dom.fabContainer.classList.toggle('open'));
         document.addEventListener('click', (e) => {
             if (!dom.fabContainer.contains(e.target)) {
@@ -887,15 +883,7 @@
             if (dom.fabExportBtn.classList.contains('is-inactive')) {
                 dom.fabExportBtn.classList.add('flash-error');
                 setTimeout(() => dom.fabExportBtn.classList.remove('flash-error'), 700);
-
-                showConfirm(
-                    t('export.title'),
-                    t('export.alertNone'),
-                    t('confirmModal.okBtn'),
-                    'btn-primary',
-                    () => { },
-                    false
-                );
+                showConfirm(t('export.title'), t('export.alertNone'), t('confirmModal.okBtn'), 'btn-primary', () => { }, false);
             } else {
                 handleExport();
             }
@@ -905,17 +893,14 @@
             setLanguage(newLang, true);
         });
 
-        // Main Modal
         dom.lectureModal.addEventListener('click', (e) => {
-            const target = e.target;
-            if (target === dom.lectureModal || target.closest('.modal-close-button')) {
+            if (e.target === dom.lectureModal || e.target.closest('.modal-close-button')) {
                 hideModal(dom.lectureModal);
             }
         });
         dom.editForm.addEventListener('submit', handleFormSubmit);
         dom.editForm.addEventListener('input', (e) => {
-            const target = e.target;
-            if (target.id === 'subject') {
+            if (e.target.id === 'subject') {
                 updateFormState();
             }
         });
@@ -938,32 +923,26 @@
             }
         });
 
-        // Confirm Modal
         dom.confirmModal.addEventListener('click', (e) => {
-            const target = e.target;
-            if (target === dom.confirmModal || target.closest('.modal-close-button')) {
+            if (e.target === dom.confirmModal || e.target.closest('.modal-close-button')) {
                 hideModal(dom.confirmModal);
             }
         });
 
-        // Settings Modal
         dom.settingsModal.addEventListener('click', (e) => {
-            const target = e.target;
-            if (target === dom.settingsModal || target.closest('.modal-close-button')) {
+            if (e.target === dom.settingsModal || e.target.closest('.modal-close-button')) {
                 hideModal(dom.settingsModal);
             }
         });
         dom.appTitleInputEn.addEventListener('change', (e) => {
-            const target = e.target;
-            state.settings.appTitle.en = target.value.trim() || i18n['en'].appTitle;
+            state.settings.appTitle.en = e.target.value.trim() || i18n['en'].appTitle;
             if (currentLang === 'en') {
                 dom.headerTitle.textContent = state.settings.appTitle.en;
             }
             saveData();
         });
         dom.appTitleInputAr.addEventListener('change', (e) => {
-            const target = e.target;
-            state.settings.appTitle.ar = target.value.trim() || i18n['ar'].appTitle;
+            state.settings.appTitle.ar = e.target.value.trim() || i18n['ar'].appTitle;
             if (currentLang === 'ar') {
                 dom.headerTitle.textContent = state.settings.appTitle.ar;
             }
@@ -1020,16 +999,13 @@
             }
         });
 
-        // Copy Paste Modal
         dom.copyPasteModal.addEventListener('click', (e) => {
-            const target = e.target;
-            if (target === dom.copyPasteModal || target.closest('.modal-close-button')) {
+            if (e.target === dom.copyPasteModal || e.target.closest('.modal-close-button')) {
                 hideModal(dom.copyPasteModal);
             }
         });
         dom.copyPasteTargetGrid.addEventListener('click', (e) => {
-            const target = e.target;
-            const slot = target.closest('.copy-paste-slot');
+            const slot = e.target.closest('.copy-paste-slot');
             if (!slot || !clipboard) return;
             const { day, index: indexStr } = slot.dataset;
             const index = parseInt(indexStr, 10);
@@ -1051,10 +1027,8 @@
             }
         });
 
-        // Export Modal
         dom.exportModal.addEventListener('click', (e) => {
-            const target = e.target;
-            if (target === dom.exportModal || target.closest('.modal-close-button')) {
+            if (e.target === dom.exportModal || e.target.closest('.modal-close-button')) {
                 hideModal(dom.exportModal);
             }
         });
@@ -1074,7 +1048,6 @@
             }
         });
 
-        // Language Modal Listeners
         dom.langModalSwitchBtn.addEventListener('click', () => {
             if (dom.langModalDontAsk.checked) localStorage.setItem('lang_dont_ask', 'true');
             setLanguage('ar', true);
@@ -1085,7 +1058,6 @@
             hideModal(dom.languageModal);
         });
 
-        // Global keydown
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 document.querySelectorAll('.modal-overlay:not(.hidden)').forEach(m => hideModal(m));
@@ -1093,11 +1065,9 @@
             }
         });
 
-        // --- Drag & Drop ---
         let draggedInfo = null;
         dom.scheduleGrid.addEventListener('dragstart', (e) => {
-            const target = e.target;
-            const card = target.closest('.lecture-card');
+            const card = e.target.closest('.lecture-card');
             if (card) {
                 draggedInfo = { el: card, day: card.dataset.day, index: parseInt(card.dataset.index, 10) };
                 setTimeout(() => card.classList.add('dragging'), 0);
@@ -1105,8 +1075,7 @@
         });
         dom.scheduleGrid.addEventListener('dragover', (e) => {
             e.preventDefault();
-            const target = e.target;
-            const container = target.closest('.lectures-container');
+            const container = e.target.closest('.lectures-container');
             if (container && draggedInfo && container.parentElement.querySelector('.day-cell').textContent === i18n[currentLang].days[CANONICAL_DAYS.indexOf(draggedInfo.day)]) {
                 if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
             } else {
@@ -1117,8 +1086,7 @@
             e.preventDefault();
             if (!draggedInfo) return;
             draggedInfo.el.classList.remove('dragging');
-            const target = e.target;
-            const targetCard = target.closest('.lecture-card');
+            const targetCard = e.target.closest('.lecture-card');
             if (targetCard && targetCard !== draggedInfo.el) {
                 const toIndex = parseInt(targetCard.dataset.index, 10);
                 if (draggedInfo.day === targetCard.dataset.day) {
@@ -1144,15 +1112,11 @@
         dom.searchInput.placeholder = t('header.searchPlaceholder');
         dom.settingsBtn.setAttribute('aria-label', t('header.settingsAria'));
         dom.themeToggleBtn.setAttribute('aria-label', t('header.themeAria'));
-
-        // Filters
         document.getElementById('day-filter-label').textContent = t('filters.view');
         document.getElementById('day-filter-all').textContent = t('filters.allDays');
         document.getElementById('day-filter-filled').textContent = t('filters.filledDays');
         document.getElementById('day-filter-empty').textContent = t('filters.emptyDays');
         document.getElementById('subject-filter-label').textContent = t('filters.subject');
-
-        // Form Labels
         document.getElementById('form-label-subject').textContent = t('lectureModal.form.subject');
         document.getElementById('form-label-lecturer').textContent = t('lectureModal.form.lecturer');
         document.getElementById('form-label-college').textContent = t('lectureModal.form.college');
@@ -1160,8 +1124,6 @@
         document.getElementById('form-label-group').textContent = t('lectureModal.form.group');
         document.getElementById('form-label-startTime').textContent = t('lectureModal.form.startTime');
         document.getElementById('form-label-endTime').textContent = t('lectureModal.form.endTime');
-
-        // Modals
         document.getElementById('settings-title').textContent = t('settings.title');
         document.getElementById('settings-appearance-title').textContent = t('settings.appearance');
         document.getElementById('settings-app-title-label-en').textContent = t('settings.appTitleEn');
@@ -1174,19 +1136,14 @@
         document.getElementById('export-filename-label').textContent = t('export.filename');
         document.getElementById('export-cancel-btn').textContent = t('export.cancel');
         document.getElementById('export-confirm-btn').textContent = t('export.confirm');
-
-        // FAB Tooltips
         dom.fabImportBtn.title = t('fab.import');
         dom.fabExportBtn.title = t('fab.export');
         dom.fabLangBtn.title = t('fab.language');
         dom.fabMainBtn.setAttribute('aria-label', t('fab.main'));
-
-        // === NEW: Update About Developer Modal Text ===
         const ghModalTitle = document.getElementById('gh-profile-modal-title');
         const ghTitle = document.getElementById('gh-profile-title');
         const ghDesc = document.getElementById('gh-profile-description');
         const ghActionLink = document.getElementById('gh-profile-action-link')?.querySelector('span');
-
         if (ghModalTitle) ghModalTitle.textContent = t('profileModal.modalTitle');
         if (ghTitle) ghTitle.textContent = t('profileModal.title');
         if (ghDesc) ghDesc.textContent = t('profileModal.description');
@@ -1210,6 +1167,17 @@
     const applyState = () => {
         dom.headerTitle.textContent = state.settings.appTitle[currentLang] || t('appTitle');
         applyTheme(state.settings.darkMode);
+
+        dom.dayFilter.value = state.filters.dayStatus;
+        if (Array.from(dom.subjectFilter.options).some(opt => opt.value === state.filters.subject)) {
+            dom.subjectFilter.value = state.filters.subject;
+        } else {
+            // fallback to 'all' if the saved subject is no longer available
+            state.filters.subject = 'all';
+            dom.subjectFilter.value = 'all';
+        }
+        dom.searchInput.value = state.searchQuery;
+
         const totalLectures = getTotalLectures();
         dom.fabExportBtn.disabled = false;
         dom.fabExportBtn.classList.toggle('is-inactive', totalLectures === 0);
@@ -1232,18 +1200,18 @@
             document.getElementById('lang-modal-keep-btn').textContent = i18n.ar.langModal.keepBtn;
             document.getElementById('lang-modal-dont-ask-label').textContent = i18n.ar.langModal.dontAsk;
             showModal(dom.languageModal);
+            setLanguage('en', false); // Default to English visually, but show prompt
+        } else {
+            setLanguage('en', false); // Default to English
         }
-
-        setLanguage('en', false); // Default to English
     };
 
     const initialize = () => {
         addEventListeners();
         initializeLanguage();
         setupAutocomplete();
-        setInterval(updateAllCountdowns, 1000); // Update countdowns every second
+        setInterval(updateAllCountdowns, 1000);
     };
 
     initialize();
 })();
-
