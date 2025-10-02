@@ -76,6 +76,7 @@ html.dark {
 * {
   border: none;
   outline: none !important;
+  -webkit-tap-highlight-color:transparent;
 }
 
 body {
@@ -1431,3 +1432,4 @@ main {
 .json-preview-container.copied::after {
     opacity: 1;
 }
+
